@@ -1,11 +1,36 @@
 // Ad Maiorem Dei Gloriam!
 #include "editor.hpp"
 
+#ifdef _WIN32
+
+#else
+
+#include <termios.h>
+#include <unistd.h>
+
+struct termios oldt, newt;
+void Editor::initTerminal() {
+    tcgetattr(STDIN_FILENO, &oldt);
+    tcgetattr(STDIN_FILENO, &newt);
+
+    // Echo need to be disabled because it dessyncs with the screen frequently
+    newt.c_cflag &= ~(ICANON | ECHO);
+
+    tcsetattr(STDIN_FILENO, TCSANOW, &newt);
+}
+
+void Editor::restoreTerminal() {
+    tcsetattr(STDIN_FILENO, TCSANOW, &oldt);
+}
+#endif
+
 Editor::~Editor() {
     if (mCurrentFile) {
         saveFile();
         delete mCurrentFile;
     }
+
+    restoreTerminal();
 }
 
 void Editor::loadFile(const std::string& filepath) {

@@ -16,8 +16,8 @@ public:
     void start();
 private:
 
-    void initTerminal();
-    void restoreTerminal();
+    static void initTerminal();
+    static void restoreTerminal();
 
     void saveFile();
 
