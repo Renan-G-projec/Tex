@@ -68,6 +68,38 @@ void Editor::loadFile(const std::string& filepath) {
     }
 }
 
+void Editor::processInput() {
+    // Linux base implementation for now
+    char inputBuffer[3];
+    int bytesRead;
+    if (bytesRead = read(STDIN_FILENO, inputBuffer, sizeof(inputBuffer)/sizeof(inputBuffer[0]))) {
+        if (bytesRead == 1) {
+            if (inputBuffer[0] == '\n') {
+                mCursorPos.row++;
+                mCurrentFileLines.emplace(mCurrentFileLines.cbegin() + mCursorPos.row);
+            } else if (inputBuffer[0] == '\033') {
+                mRunning = false;
+            } else {
+                insertAtCursor(inputBuffer[0]);
+                mCursorPos.col++;
+            }
+        }
+        render();
+    }
+}
+
+void Editor::insertAtCursor(char ch) {
+    std::string &currentLine = mCurrentFileLines[mCursorPos.row];
+    currentLine.insert(mCursorPos.col, 1, ch);
+}
+
+void Editor::render() {
+    std::cout << "\033[" << mCursorPos.row + 1 << ";" << mCursorPos.col +1 << "H";
+    for (auto line : mCurrentFileLines) {
+        std::cout << line << "\n";
+    }
+}
+
 void Editor::saveFile() {
     if (!mCurrentFile) return;
     for (auto line : mCurrentFileLines) {

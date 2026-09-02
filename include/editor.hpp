@@ -24,11 +24,15 @@ public:
     void start();
 private:
 
+    bool mRunning = true;
+
     static void initTerminal();
     static void restoreTerminal();
 
     void processInput();
+    void insertAtCursor(char);
     void saveFile();
+    void render();
 
     std::fstream *mCurrentFile{nullptr};
     std::vector<std::string> mCurrentFileLines; // To refactor this. For now shall be enough
