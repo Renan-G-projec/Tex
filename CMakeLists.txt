@@ -8,6 +8,7 @@ target_sources(
     Tex
     PRIVATE
     src/main.cpp
+    src/editor.cpp
 )
 
-target_include_directories(Tex PRIVATE '/include')
+target_include_directories(Tex PRIVATE include)

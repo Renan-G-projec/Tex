@@ -5,10 +5,11 @@
 #include <string>
 #include <vector>
 #include <fstream>
+#include <iostream>
 
 class Editor {
 public:
-    Editor();
+    Editor() = default;
     ~Editor();
 
     void loadFile(const std::string& filepath);

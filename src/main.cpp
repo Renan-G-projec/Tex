@@ -1,7 +1,10 @@
 // Ad Maiorem Dei Gloriam!
 #include <iostream>
+#include "editor.hpp"
 
 int main() {
-    std::cout << "Hello, world!\n";
+    Editor editor;
+
+    editor.loadFile("src/main.cpp");
     return 0;
 }
