@@ -1,4 +1,4 @@
-# Prerequisites
+# Ad Maiorem Dei Gloriam!
 *.d
 
 # Compiled Object files
@@ -43,6 +43,7 @@
 build/
 Build/
 build-*/
+!build/.gitkeep
 
 # CMake generated files
 CMakeFiles/
