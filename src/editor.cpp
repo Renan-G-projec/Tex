@@ -8,10 +8,10 @@
 #include <termios.h>
 #include <unistd.h>
 
-struct termios oldt, newt;
+static struct termios oldt, newt;
 void Editor::initTerminal() {
     tcgetattr(STDIN_FILENO, &oldt);
-    tcgetattr(STDIN_FILENO, &newt);
+    newt = oldt; // Copy
 
     // Echo need to be disabled because it dessyncs with the screen frequently
     newt.c_cflag &= ~(ICANON | ECHO);
@@ -22,7 +22,12 @@ void Editor::initTerminal() {
 void Editor::restoreTerminal() {
     tcsetattr(STDIN_FILENO, TCSANOW, &oldt);
 }
+
 #endif
+
+Editor::Editor() {
+    initTerminal();
+}
 
 Editor::~Editor() {
     if (mCurrentFile) {

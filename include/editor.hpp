@@ -9,7 +9,7 @@
 
 class Editor {
 public:
-    Editor() = default;
+    Editor();
     ~Editor();
 
     void loadFile(const std::string& filepath);
