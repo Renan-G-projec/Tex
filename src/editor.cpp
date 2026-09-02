@@ -1,11 +1,14 @@
 // Ad Maiorem Dei Gloriam!
 #include "editor.hpp"
 
+static TerminalSize getTerminalSize();
+
 #ifdef _WIN32
 
 #else
 
 #include <termios.h>
+#include <sys/ioctl.h>
 #include <unistd.h>
 
 static struct termios oldt, newt;
@@ -23,10 +26,18 @@ void Editor::restoreTerminal() {
     tcsetattr(STDIN_FILENO, TCSANOW, &oldt);
 }
 
+static TerminalSize getTerminalSize() {
+    winsize ws;
+    ioctl(STDIN_FILENO, TIOCGWINSZ, &ws);
+
+    return {ws.ws_row, ws.ws_col};
+}
+
 #endif
 
 Editor::Editor() {
     initTerminal();
+    mTerminalSize = getTerminalSize();
 }
 
 Editor::~Editor() {

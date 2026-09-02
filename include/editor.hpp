@@ -7,6 +7,14 @@
 #include <fstream>
 #include <iostream>
 
+struct CursorPosition {
+    unsigned int row, col;
+};
+
+struct TerminalSize {
+    unsigned int rows, cols;
+};
+
 class Editor {
 public:
     Editor();
@@ -19,10 +27,13 @@ private:
     static void initTerminal();
     static void restoreTerminal();
 
+    void processInput();
     void saveFile();
 
     std::fstream *mCurrentFile{nullptr};
     std::vector<std::string> mCurrentFileLines; // To refactor this. For now shall be enough
+    CursorPosition mCursorPos = {0};
+    TerminalSize mTerminalSize;
 };
 
 #endif
