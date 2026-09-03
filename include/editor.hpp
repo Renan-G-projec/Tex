@@ -20,7 +20,8 @@ public:
     Editor();
     ~Editor();
 
-    void loadFile(const std::string& filepath);
+    // Success if the file is 
+    bool loadFile(const std::string& filepath);
     void start();
 private:
 

@@ -49,16 +49,19 @@ Editor::~Editor() {
     restoreTerminal();
 }
 
-void Editor::loadFile(const std::string& filepath) {
+bool Editor::loadFile(const std::string& filepath) {
     if (mCurrentFile) {
         delete mCurrentFile;
     }
 
-    mCurrentFile = new std::fstream(filepath);
+    mCurrentFile = new std::fstream(filepath, std::fstream::in | std::fstream::out | std::fstream::app);
+    mCurrentFile->seekg(0);
+    mCurrentFile->seekp(0);
     if (!mCurrentFile->is_open()) {
         delete mCurrentFile;
         mCurrentFile = nullptr;
-        std::cout << "Error: Could not open " << filepath << '\n'; 
+        std::cout << "Error: Could not open " << filepath << '\n';
+        return false;
     }
 
     // Just pushes a empty string
@@ -66,6 +69,7 @@ void Editor::loadFile(const std::string& filepath) {
     while (std::getline(*mCurrentFile, mCurrentFileLines.back())) {
         mCurrentFileLines.push_back({});
     }
+    return true;
 }
 
 void Editor::start() {
