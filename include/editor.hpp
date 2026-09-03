@@ -35,7 +35,7 @@ private:
     void saveFile();
     void render();
 
-    std::fstream *mCurrentFile{nullptr};
+    std::fstream mCurrentFile;
     std::vector<std::string> mCurrentFileLines; // To refactor this. For now shall be enough
     CursorPosition mCursorPos = {0};
     TerminalSize mTerminalSize;

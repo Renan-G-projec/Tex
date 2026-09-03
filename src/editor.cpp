@@ -41,32 +41,27 @@ Editor::Editor() {
 }
 
 Editor::~Editor() {
-    if (mCurrentFile) {
+    if (mCurrentFile.is_open()) {
         saveFile();
-        delete mCurrentFile;
+        mCurrentFile.close();
     }
-
+    
     restoreTerminal();
 }
 
 bool Editor::loadFile(const std::string& filepath) {
-    if (mCurrentFile) {
-        delete mCurrentFile;
-    }
-
-    mCurrentFile = new std::fstream(filepath, std::fstream::in | std::fstream::out | std::fstream::app);
-    mCurrentFile->seekg(0);
-    mCurrentFile->seekp(0);
-    if (!mCurrentFile->is_open()) {
-        delete mCurrentFile;
-        mCurrentFile = nullptr;
+    if (mCurrentFile.is_open()) mCurrentFile.close();
+    
+    mCurrentFile.clear();
+    mCurrentFile.open(filepath, std::ios::in | std::ios::out);
+    if (!mCurrentFile.is_open()) {
         std::cout << "Error: Could not open " << filepath << '\n';
         return false;
     }
-
+    
     // Just pushes a empty string
     mCurrentFileLines.push_back({});
-    while (std::getline(*mCurrentFile, mCurrentFileLines.back())) {
+    while (std::getline(mCurrentFile, mCurrentFileLines.back())) {
         mCurrentFileLines.push_back({});
     }
     return true;
@@ -77,6 +72,7 @@ void Editor::start() {
     while (mRunning) {
         processInput();
     }
+    saveFile();
 }
 
 void Editor::processInput() {
@@ -117,9 +113,10 @@ void Editor::render() {
 }
 
 void Editor::saveFile() {
-    if (!mCurrentFile) return;
-    for (auto line : mCurrentFileLines) {
-        *mCurrentFile << line << '\n';
+    mCurrentFile.clear();
+    mCurrentFile.seekp(0);
+    for (const auto& line : mCurrentFileLines) {
+        mCurrentFile << line;
     }
-    mCurrentFile->flush();
+    mCurrentFile.flush();
 }
