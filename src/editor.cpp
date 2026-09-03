@@ -103,11 +103,17 @@ void Editor::insertAtCursor(char ch) {
 }
 
 void Editor::render() {
-    std::cout << "\033[2J\033[H";
+    constexpr auto clearScreen = [](){
+        std::cout << "\033[H\033[2J\033[3J";
+        std::cout.flush();
+    };
+
+    clearScreen();
     for (auto line : mCurrentFileLines) {
         std::cout << line << "\n";
     }
-    std::cout << "\033[" << mCursorPos.row + 1 << ";" << mCursorPos.col + 1 << "H";
+    std::cout << "\033[" << mCursorPos.row + 1 << ';' << mCursorPos.col + 1 << 'H';
+    std::cout.flush();
 }
 
 void Editor::saveFile() {
