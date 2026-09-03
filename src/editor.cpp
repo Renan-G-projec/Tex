@@ -17,7 +17,7 @@ void Editor::initTerminal() {
     newt = oldt; // Copy
 
     // Echo need to be disabled because it dessyncs with the screen frequently
-    newt.c_cflag &= ~(ICANON | ECHO);
+    newt.c_lflag &= ~(ICANON | ECHO);
 
     tcsetattr(STDIN_FILENO, TCSANOW, &newt);
 }
@@ -68,36 +68,42 @@ void Editor::loadFile(const std::string& filepath) {
     }
 }
 
+void Editor::start() {
+    render();
+    while (mRunning) {
+        processInput();
+    }
+}
+
 void Editor::processInput() {
     // Linux base implementation for now
     char inputBuffer[3];
-    int bytesRead;
-    if (bytesRead = read(STDIN_FILENO, inputBuffer, sizeof(inputBuffer)/sizeof(inputBuffer[0]))) {
-        if (bytesRead == 1) {
-            if (inputBuffer[0] == '\n') {
-                mCursorPos.row++;
-                mCurrentFileLines.emplace(mCurrentFileLines.cbegin() + mCursorPos.row);
-            } else if (inputBuffer[0] == '\033') {
-                mRunning = false;
-            } else {
-                insertAtCursor(inputBuffer[0]);
-                mCursorPos.col++;
-            }
-        }
-        render();
+    read(STDIN_FILENO, inputBuffer, sizeof(inputBuffer)/sizeof(inputBuffer[0]));
+    if (inputBuffer[0] == '\n') {
+        mCursorPos.row++;
+        mCursorPos.col = 0;
+        mCurrentFileLines.emplace(mCurrentFileLines.cbegin() + mCursorPos.row + 1);
+    } else if (inputBuffer[0] == '\033') {
+        mRunning = false;
+    } else {
+        insertAtCursor(inputBuffer[0]);
+        mCursorPos.col++;
     }
+    render();
 }
 
 void Editor::insertAtCursor(char ch) {
     std::string &currentLine = mCurrentFileLines[mCursorPos.row];
+    //if (currentLine.size() >= mCursorPos.col + 1) currentLine.reserve(currentLine.size() * 2);
     currentLine.insert(mCursorPos.col, 1, ch);
 }
 
 void Editor::render() {
-    std::cout << "\033[" << mCursorPos.row + 1 << ";" << mCursorPos.col +1 << "H";
+    std::cout << "\033[2J\033[H";
     for (auto line : mCurrentFileLines) {
         std::cout << line << "\n";
     }
+    std::cout << "\033[" << mCursorPos.row + 1 << ";" << mCursorPos.col + 1 << "H";
 }
 
 void Editor::saveFile() {
