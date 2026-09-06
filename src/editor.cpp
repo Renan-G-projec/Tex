@@ -78,7 +78,7 @@ void Editor::start() {
 
 void Editor::processInput() {
     // Linux base implementation for now
-    char inputBuffer[3];
+    char inputBuffer[4];
     uint8_t bytesRead = read(STDIN_FILENO, inputBuffer, sizeof(inputBuffer)/sizeof(inputBuffer[0]));
 
     if (inputBuffer[0] == '\n') {
@@ -108,6 +108,8 @@ void Editor::processInput() {
         } else {
             mRunning = false;
         }
+    } else if (inputBuffer[0] == '\b' || inputBuffer[0] == 127) {
+        backspaceAtCursor();
     } else {
         insertAtCursor(inputBuffer[0]);
         mCursorPos.col++;
@@ -119,6 +121,12 @@ void Editor::processInput() {
 void Editor::insertAtCursor(char ch) {
     std::string &currentLine = mCurrentFileLines[mCursorPos.row];
     currentLine.insert(mCursorPos.col, 1, ch);
+}
+
+void Editor::backspaceAtCursor() {
+    if (mCursorPos.col > 0) {
+        mCurrentFileLines[mCursorPos.row].erase(mCurrentFileLines[mCursorPos.row].begin() + --mCursorPos.col);
+    }
 }
 
 void Editor::render() {

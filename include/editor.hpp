@@ -35,6 +35,7 @@ private:
 
     void processInput();
     void insertAtCursor(char);
+    void backspaceAtCursor();
     void saveFile();
     void render();
 
