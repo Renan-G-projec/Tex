@@ -84,30 +84,40 @@ void Editor::processInput() {
     if (inputBuffer[0] == '\n') {
         mCursorPos.row++;
         mCursorPos.col = 0;
-        mCurrentFileLines.emplace(mCurrentFileLines.begin() + std::min(mCursorPos.row, static_cast<unsigned int>(mCurrentFileLines.size())));
+        mCurrentFileLines.emplace(mCurrentFileLines.begin() + std::min(mCursorPos.row, static_cast<int>(mCurrentFileLines.size())));
     } else if (inputBuffer[0] == '\033') {
         if (bytesRead == 3 && inputBuffer[1] == '[') {
+            bool isVerticalMovement = false;
+
             switch (inputBuffer[2]) {
-                case 'A': mCursorPos.row--; break;
-                case 'B': mCursorPos.row++; break;
+                case 'A': mCursorPos.row--; isVerticalMovement = true; break;
+                case 'B': mCursorPos.row++; isVerticalMovement = true; break;
                 case 'C': mCursorPos.col++; break;
                 case 'D': mCursorPos.col--; break;
             }
-            mCursorPos.row = std::clamp(0, static_cast<int>(mCursorPos.row), static_cast<int>(mCurrentFileLines.size() - 1));
-            mCursorPos.col = std::clamp(0, static_cast<int>(mCursorPos.col), static_cast<int>(mCurrentFileLines[mCursorPos.row].size() - 1));
+            mCursorPos.row = std::clamp(static_cast<int>(mCursorPos.row), 0, static_cast<int>(mCurrentFileLines.size()) - 1);
+            mCursorPos.col = std::clamp(static_cast<int>(mCursorPos.col), 0, static_cast<int>(mCurrentFileLines[mCursorPos.row].size()));
+
+            if (isVerticalMovement) {
+                if (mCursorPos.col < mCursorColumnCache) {
+                    mCursorPos.col = std::min(static_cast<int>(mCurrentFileLines[mCursorPos.row].size()) - 1, static_cast<int>(mCursorColumnCache));
+                };
+            } else {
+                mCursorColumnCache = mCursorPos.col;
+            }
         } else {
             mRunning = false;
         }
     } else {
         insertAtCursor(inputBuffer[0]);
         mCursorPos.col++;
+        mCursorColumnCache = mCursorPos.col;
     }
     render();
 }
 
 void Editor::insertAtCursor(char ch) {
     std::string &currentLine = mCurrentFileLines[mCursorPos.row];
-    //if (currentLine.size() >= mCursorPos.col + 1) currentLine.reserve(currentLine.size() * 2);
     currentLine.insert(mCursorPos.col, 1, ch);
 }
 

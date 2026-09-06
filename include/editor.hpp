@@ -11,7 +11,7 @@
 #include <cmath>
 
 struct CursorPosition {
-    unsigned int row, col;
+    int row, col;
 };
 
 struct TerminalSize {
@@ -38,10 +38,12 @@ private:
     void saveFile();
     void render();
 
+    
     std::fstream mCurrentFile;
     std::vector<std::string> mCurrentFileLines; // To refactor this. For now shall be enough
     CursorPosition mCursorPos = {0};
     TerminalSize mTerminalSize;
+    unsigned int mCursorColumnCache = 0;
 };
 
 #endif
