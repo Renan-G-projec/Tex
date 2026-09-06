@@ -126,6 +126,10 @@ void Editor::insertAtCursor(char ch) {
 void Editor::backspaceAtCursor() {
     if (mCursorPos.col > 0) {
         mCurrentFileLines[mCursorPos.row].erase(mCurrentFileLines[mCursorPos.row].begin() + --mCursorPos.col);
+    } else if (mCursorPos.col == 0 && mCursorPos.row > 0) {
+        mCursorPos.col = static_cast<int>(mCurrentFileLines[mCursorPos.row].size());
+        mCurrentFileLines[mCursorPos.row - 1].append(mCurrentFileLines[mCursorPos.row]);
+        mCurrentFileLines.erase(mCurrentFileLines.begin() + mCursorPos.row--);
     }
 }
 
