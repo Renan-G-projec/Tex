@@ -82,9 +82,17 @@ void Editor::processInput() {
     uint8_t bytesRead = read(STDIN_FILENO, inputBuffer, sizeof(inputBuffer)/sizeof(inputBuffer[0]));
 
     if (inputBuffer[0] == '\n') {
+        std::string lineRemainder = mCurrentFileLines[mCursorPos.row].substr(mCursorPos.col);
+
+        mCurrentFileLines[mCursorPos.row].erase(mCursorPos.col);
+
         mCursorPos.row++;
+
+        auto insertPos = mCurrentFileLines.begin() + std::min(static_cast<std::size_t>(mCursorPos.row), mCurrentFileLines.size());
+        mCurrentFileLines.emplace(insertPos, std::move(lineRemainder));
+
         mCursorPos.col = 0;
-        mCurrentFileLines.emplace(mCurrentFileLines.begin() + std::min(mCursorPos.row, static_cast<int>(mCurrentFileLines.size())));
+        mCursorColumnCache = 0;
     } else if (inputBuffer[0] == '\033') {
         if (bytesRead == 3 && inputBuffer[1] == '[') {
             bool isVerticalMovement = false;
