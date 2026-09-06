@@ -15,3 +15,6 @@ For now, it is only for unix. New updates will come soon.
 1. Clone the repository with `git clone https://github.com/Renan-G-projec`
 2. Build with cmake `cmake -B build && cmake --build build`
 3. Run the project `./build/Tex ./built/test.txt`
+
+## AI Usage declaration
+I tried to use AI as little ad i could. But i used a little help of it while debugging some segfaults. I just used it when i was stuck by a long time though.
