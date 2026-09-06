@@ -79,13 +79,25 @@ void Editor::start() {
 void Editor::processInput() {
     // Linux base implementation for now
     char inputBuffer[3];
-    read(STDIN_FILENO, inputBuffer, sizeof(inputBuffer)/sizeof(inputBuffer[0]));
+    uint8_t bytesRead = read(STDIN_FILENO, inputBuffer, sizeof(inputBuffer)/sizeof(inputBuffer[0]));
+
     if (inputBuffer[0] == '\n') {
         mCursorPos.row++;
         mCursorPos.col = 0;
         mCurrentFileLines.emplace(mCurrentFileLines.begin() + std::min(mCursorPos.row, static_cast<unsigned int>(mCurrentFileLines.size())));
     } else if (inputBuffer[0] == '\033') {
-        mRunning = false;
+        if (bytesRead == 3 && inputBuffer[1] == '[') {
+            switch (inputBuffer[2]) {
+                case 'A': mCursorPos.row--; break;
+                case 'B': mCursorPos.row++; break;
+                case 'C': mCursorPos.col++; break;
+                case 'D': mCursorPos.col--; break;
+            }
+            mCursorPos.row = std::clamp(0, static_cast<int>(mCursorPos.row), static_cast<int>(mCurrentFileLines.size() - 1));
+            mCursorPos.col = std::clamp(0, static_cast<int>(mCursorPos.col), static_cast<int>(mCurrentFileLines[mCursorPos.row].size() - 1));
+        } else {
+            mRunning = false;
+        }
     } else {
         insertAtCursor(inputBuffer[0]);
         mCursorPos.col++;

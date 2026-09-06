@@ -6,6 +6,8 @@
 #include <vector>
 #include <fstream>
 #include <iostream>
+#include <stdint.h>
+#include <algorithm>
 #include <cmath>
 
 struct CursorPosition {
