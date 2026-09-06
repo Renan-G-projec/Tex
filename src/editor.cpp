@@ -73,6 +73,7 @@ void Editor::start() {
         processInput();
     }
     saveFile();
+    std::cout << "\033[H\033[2J\033[3J";
 }
 
 void Editor::processInput() {
@@ -82,7 +83,7 @@ void Editor::processInput() {
     if (inputBuffer[0] == '\n') {
         mCursorPos.row++;
         mCursorPos.col = 0;
-        mCurrentFileLines.emplace(mCurrentFileLines.cbegin() + mCursorPos.row + 1);
+        mCurrentFileLines.emplace(mCurrentFileLines.begin() + std::min(mCursorPos.row, static_cast<unsigned int>(mCurrentFileLines.size())));
     } else if (inputBuffer[0] == '\033') {
         mRunning = false;
     } else {
@@ -106,7 +107,7 @@ void Editor::render() {
 
     clearScreen();
     for (auto line : mCurrentFileLines) {
-        std::cout << line << "\n";
+        std::cout << line << '\n';
     }
     std::cout << "\033[" << mCursorPos.row + 1 << ';' << mCursorPos.col + 1 << 'H';
     std::cout.flush();
@@ -116,7 +117,7 @@ void Editor::saveFile() {
     mCurrentFile.clear();
     mCurrentFile.seekp(0);
     for (const auto& line : mCurrentFileLines) {
-        mCurrentFile << line;
+        mCurrentFile << line << '\n';
     }
     mCurrentFile.flush();
 }

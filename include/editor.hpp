@@ -6,6 +6,7 @@
 #include <vector>
 #include <fstream>
 #include <iostream>
+#include <cmath>
 
 struct CursorPosition {
     unsigned int row, col;
