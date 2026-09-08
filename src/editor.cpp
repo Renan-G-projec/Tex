@@ -55,8 +55,10 @@ bool Editor::loadFile(const std::string& filepath) {
     mCurrentFile.clear();
     mCurrentFile.open(filepath, std::ios::in | std::ios::out);
     if (!mCurrentFile.is_open()) {
-        std::cout << "Error: Could not open " << filepath << '\n';
-        return false;
+        std::ofstream createdFile(filepath);
+        createdFile.close();
+        mCurrentFile.clear();
+        mCurrentFile.open(filepath, std::ios::in | std::ios::out);
     }
     
     // Just pushes a empty string
